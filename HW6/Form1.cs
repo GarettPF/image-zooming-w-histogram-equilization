@@ -47,6 +47,31 @@ namespace HW6
             return result;
         }
 
+        private void getRGBsegment(int x, int y, ref byte[,] R, ref byte[,] G, ref byte[,] B)
+        {
+            Bitmap img = (Bitmap)image.Image;
+
+            for (int i = -25; i < 25; i++)
+            {
+                for (int j = -25; j < 25; j++)
+                {
+                    try
+                    {
+                        Color c = img.GetPixel(x + i, y + j);
+                        R[25 + i, 25 + j] = c.R;
+                        G[25 + i, 25 + j] = c.G;
+                        B[25 + i, 25 + j] = c.B;
+                    }
+                    catch
+                    {
+                        R[25 + i, 25 + j] = 0;
+                        G[25 + i, 25 + j] = 0;
+                        B[25 + i, 25 + j] = 0;
+                    }
+                }
+            }
+        }
+
         private void image_MouseDown(object sender, MouseEventArgs e)
         {
             if (image == null || image.Image == null)
@@ -59,13 +84,14 @@ namespace HW6
             { // Do a grayscale zoom
                 byte[,] grayPxls = getGrayScaleSegment(x, y);
                 grayPxls = resizeImage(grayPxls);
+                equilization(ref grayPxls);
 
                 Bitmap zoomImage = new Bitmap(100, 100);
                 for (int i = 0; i < 100; i++)
                 {
                     for (int j = 0; j < 100; j++)
                     {
-                        int c = (int)grayPxls[i, j];
+                        byte c = grayPxls[i, j];
                         zoomImage.SetPixel(i, j, Color.FromArgb(c, c, c));
                     }
                 }
@@ -77,7 +103,32 @@ namespace HW6
             
             else if (colored.Checked)
             { // Do a colored zoom
+                byte[,] R = new byte[50, 50], 
+                        G = new byte[50, 50], 
+                        B = new byte[50, 50];
+                getRGBsegment(x, y, ref R, ref G, ref B);
+                R = resizeImage(R);
+                G = resizeImage(G);
+                B = resizeImage(B);
+                equilization(ref R);
+                equilization(ref G);
+                equilization(ref B);
 
+                Bitmap zoomImage = new Bitmap(100, 100);
+                for (int i = 0; i < 100; i++)
+                {
+                    for (int j = 0; j < 100; j++)
+                    {
+                        byte r = R[i, j];
+                        byte g = G[i, j];
+                        byte b = B[i, j];
+                        zoomImage.SetPixel(i, j, Color.FromArgb(r, g, b));
+                    }
+                }
+
+                zoom.Image = zoomImage;
+                zoom.Size = zoom.Image.Size;
+                zoom.Visible = true;
             }
         }
 
@@ -138,6 +189,30 @@ namespace HW6
             }
 
             return resize;
+        }
+
+        private void equilization(ref byte[,] layer)
+        {
+            float[] cdf = new float[256];
+            int[] f = new int[256];
+
+            // read the intensities
+            for (int x = 0; x < 100; x++)
+                for (int y = 0; y < 100; y++)
+                    f[layer[x, y]]++;
+
+            cdf[0] = f[0];
+
+            // equilize the values
+            for (int i = 1; i < 256; i++)
+                cdf[i] = cdf[i - 1] + f[i];
+            for (int j = 0; j < 256; j++)
+                cdf[j] = cdf[j] / cdf[255];
+
+            // modify the layer
+            for (int x = 0; x < 100; x++)
+                for (int y = 0; y < 100; y++)
+                    layer[x, y] = (byte)(255f * cdf[layer[x, y]]);
         }
     }
 }
