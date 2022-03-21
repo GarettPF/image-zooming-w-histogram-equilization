@@ -5,6 +5,7 @@ namespace HW6
         public Form1()
         {
             InitializeComponent();
+            zoom.BringToFront();
             this.Width = 160;
             this.Height = 142;
         }
@@ -80,13 +81,13 @@ namespace HW6
             int x = e.X;
             int y = e.Y;
 
+            Bitmap zoomImage = new Bitmap(100, 100);
             if (grayscale.Checked)
             { // Do a grayscale zoom
                 byte[,] grayPxls = getGrayScaleSegment(x, y);
                 grayPxls = resizeImage(grayPxls);
                 equilization(ref grayPxls);
 
-                Bitmap zoomImage = new Bitmap(100, 100);
                 for (int i = 0; i < 100; i++)
                 {
                     for (int j = 0; j < 100; j++)
@@ -95,10 +96,6 @@ namespace HW6
                         zoomImage.SetPixel(i, j, Color.FromArgb(c, c, c));
                     }
                 }
-
-                zoom.Image = zoomImage;
-                zoom.Size = zoom.Image.Size;
-                zoom.Visible = true;
             } 
             
             else if (colored.Checked)
@@ -114,7 +111,6 @@ namespace HW6
                 equilization(ref G);
                 equilization(ref B);
 
-                Bitmap zoomImage = new Bitmap(100, 100);
                 for (int i = 0; i < 100; i++)
                 {
                     for (int j = 0; j < 100; j++)
@@ -125,11 +121,19 @@ namespace HW6
                         zoomImage.SetPixel(i, j, Color.FromArgb(r, g, b));
                     }
                 }
-
-                zoom.Image = zoomImage;
-                zoom.Size = zoom.Image.Size;
-                zoom.Visible = true;
             }
+
+            zoom.Image = zoomImage;
+            zoom.Size = zoom.Image.Size;
+            zoom.Visible = true;
+            if (moveZoom.Checked)
+                zoom.Location = new Point(x + 20, y - 75);
+            else
+                zoom.Location = new Point(12, 128);
+        }
+        private void image_MouseUp(object sender, MouseEventArgs e)
+        {
+            zoom.Visible = false;
         }
 
         private byte[,] resizeImage(byte[,] layer)
@@ -213,6 +217,25 @@ namespace HW6
             for (int x = 0; x < 100; x++)
                 for (int y = 0; y < 100; y++)
                     layer[x, y] = (byte)(255f * cdf[layer[x, y]]);
+        }
+
+        private void image_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.X < 0 || e.Y < 0 || e.X > image.Width || e.Y > image.Height)
+            {
+                image_MouseUp(sender, e);
+                return;
+            }
+
+
+            if (e.Button == MouseButtons.Left)
+            {
+                image_MouseDown(sender, e);
+            }
+            else
+            {
+                image_MouseUp(sender, e);
+            }
         }
     }
 }

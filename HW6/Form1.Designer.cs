@@ -33,6 +33,7 @@
             this.grayscale = new System.Windows.Forms.RadioButton();
             this.colored = new System.Windows.Forms.RadioButton();
             this.zoom = new System.Windows.Forms.PictureBox();
+            this.moveZoom = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.image)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.zoom)).BeginInit();
             this.SuspendLayout();
@@ -55,6 +56,8 @@
             this.image.TabIndex = 1;
             this.image.TabStop = false;
             this.image.MouseDown += new System.Windows.Forms.MouseEventHandler(this.image_MouseDown);
+            this.image.MouseMove += new System.Windows.Forms.MouseEventHandler(this.image_MouseMove);
+            this.image.MouseUp += new System.Windows.Forms.MouseEventHandler(this.image_MouseUp);
             // 
             // grayscale
             // 
@@ -80,17 +83,30 @@
             // 
             // zoom
             // 
-            this.zoom.Location = new System.Drawing.Point(24, 99);
+            this.zoom.Location = new System.Drawing.Point(21, 128);
             this.zoom.Name = "zoom";
-            this.zoom.Size = new System.Drawing.Size(110, 55);
+            this.zoom.Size = new System.Drawing.Size(100, 100);
             this.zoom.TabIndex = 4;
             this.zoom.TabStop = false;
+            // 
+            // moveZoom
+            // 
+            this.moveZoom.Checked = true;
+            this.moveZoom.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.moveZoom.Location = new System.Drawing.Point(12, 99);
+            this.moveZoom.Name = "moveZoom";
+            this.moveZoom.Size = new System.Drawing.Size(122, 23);
+            this.moveZoom.TabIndex = 5;
+            this.moveZoom.Text = "Move Zoom";
+            this.moveZoom.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.moveZoom.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(398, 190);
+            this.ClientSize = new System.Drawing.Size(398, 242);
+            this.Controls.Add(this.moveZoom);
             this.Controls.Add(this.zoom);
             this.Controls.Add(this.colored);
             this.Controls.Add(this.grayscale);
@@ -112,5 +128,6 @@
         private RadioButton grayscale;
         private RadioButton colored;
         private PictureBox zoom;
+        private CheckBox moveZoom;
     }
 }
